@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pg-etcd
+  name: pg-etcd-svc
+spec:
+  selector:
+    app: pg-etcd
+  ports:
+    - name: client-port
+      protocol: TCP
+      port: 2379
+      targetPort: 2379
+    - name: peer-port
+      protocol: TCP
+      port: 2380
+      targetPort: 2380
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pg-etcd
+spec:
+  selector:
+    matchLabels:
+      app: pg-etcd
+  serviceName: pg-etcd-svc
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: pg-etcd
+    spec:
+      containers:
+      - name: pg-etcd
+        imagePullPolicy: Always
+        image: iliadmitriev/etcd-cluster
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /v2/keys/
+            port: 2379
+          initialDelaySeconds: 3
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        ports:
+        - containerPort: 2379
+          name: client-port
+        - containerPort: 2380
+          name: peer-port
+        volumeMounts:
+        - name: pg-etcd-pvc
+          mountPath: /data
+        env:
+          - name: ETCD_CLUSTER_IP
+            value: pg-etcd-svc
+          - name: HOSTNAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: HOST_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: ETCD_INITIAL_CLUSTER_TOKEN
+            value: secret_token_for_etcd
+  volumeClaimTemplates:
+  - metadata:
+      name: pg-etcd-pvc
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
