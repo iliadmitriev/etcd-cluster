@@ -46,7 +46,7 @@ CLIENT_PORT = env.get('CLIENT_PORT', 2379)
 SERVER_PORT = env.get('SERVER_PORT', 2380)
 
 INSTANCE_ID = env.get('HOSTNAME', socket.gethostname())
-INSTANCE_IP = env.get('HOST_IP', '127.0.0.1')
+INSTANCE_IP = env.get('HOST_IP', '0.0.0.0')
 
 ETCD_DIR = env.get('ETCD_DIR', '/opt/etcd')
 DATA_DIR = env.get('ETCD_DATA_DIR', '/var/lib/etcd/data')
@@ -75,9 +75,9 @@ if not cluster_found:
         f"{ETCD_DIR}/etcd",
         "--enable-v2",
         "--name", f"{INSTANCE_ID}",
-        "--listen-client-urls", f"http://0.0.0.0:2379,{CLIENT_SCHEME}://{INSTANCE_IP}:{CLIENT_PORT}",
+        "--listen-client-urls", f"{CLIENT_SCHEME}://0.0.0.0:{CLIENT_PORT}",
         "--advertise-client-urls", f"{CLIENT_SCHEME}://{INSTANCE_IP}:{CLIENT_PORT}",
-        "--listen-peer-urls", f"{CLIENT_SCHEME}://{INSTANCE_IP}:{SERVER_PORT}",
+        "--listen-peer-urls", f"{CLIENT_SCHEME}://0.0.0.0:{SERVER_PORT}",
         "--initial-advertise-peer-urls", f"{CLIENT_SCHEME}://{INSTANCE_IP}:{SERVER_PORT}",
         "--initial-cluster-state", "new"
     ]
@@ -152,9 +152,9 @@ else:
         "--enable-v2",
         "--name", f"{INSTANCE_ID}",
         f"--initial-cluster", ','.join(initial_cluster),
-        "--listen-client-urls", f"http://0.0.0.0:2379,{CLIENT_SCHEME}://{INSTANCE_IP}:{CLIENT_PORT}",
+        "--listen-client-urls", f"{CLIENT_SCHEME}://0.0.0.0:{CLIENT_PORT}",
         "--advertise-client-urls", f"{CLIENT_SCHEME}://{INSTANCE_IP}:{CLIENT_PORT}",
-        "--listen-peer-urls", f"{CLIENT_SCHEME}://{INSTANCE_IP}:{SERVER_PORT}",
+        "--listen-peer-urls", f"{CLIENT_SCHEME}://0.0.0.0:{SERVER_PORT}",
         "--initial-advertise-peer-urls", f"{CLIENT_SCHEME}://{INSTANCE_IP}:{SERVER_PORT}",
         "--initial-cluster-state", "existing"
     ]
