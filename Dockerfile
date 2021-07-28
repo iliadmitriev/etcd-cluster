@@ -40,6 +40,8 @@ COPY --chown=etcd etcd-cluster.py $ETCD_DIR/etcd-cluster.py
 
 USER $ETCD_USER
 
+STOPSIGNAL SIGINT
+
 EXPOSE 2379 2380
 
 CMD ["/usr/bin/python3", "/opt/etcd/etcd-cluster.py"]
