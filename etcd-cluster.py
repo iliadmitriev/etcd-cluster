@@ -48,7 +48,8 @@ SERVER_PORT = env.get('SERVER_PORT', 2380)
 INSTANCE_ID = env.get('HOSTNAME', socket.gethostname())
 INSTANCE_IP = env.get('HOST_IP', '127.0.0.1')
 
-DATA_DIR = env.get('ETCD_DATA_DIR', f"/data/etcd.data")
+ETCD_DIR = env.get('ETCD_DIR', '/opt/etcd')
+DATA_DIR = env.get('ETCD_DATA_DIR', '/var/lib/etcd/data')
 
 CLIENT_SCHEME = env.get('CLIENT_SCHEME', 'http')
 PEER_SCHEME = env.get('PEER_SCHEME', 'http')
@@ -71,7 +72,7 @@ if not cluster_found:
         shutil.rmtree(DATA_DIR)
 
     command = [
-        "etcd",
+        f"{ETCD_DIR}/etcd",
         "--enable-v2",
         "--name", f"{INSTANCE_ID}",
         "--listen-client-urls", f"http://127.0.0.1:2379,{CLIENT_SCHEME}://{INSTANCE_IP}:{CLIENT_PORT}",
@@ -82,6 +83,7 @@ if not cluster_found:
     ]
     command_env = env.copy()
     command_env.update({'ETCD_INITIAL_CLUSTER_TOKEN': ETCD_INITIAL_CLUSTER_TOKEN})
+    command_env.update({'ETCD_DATA_DIR': DATA_DIR})
     subprocess.call(command, stdout=sys.stdout, preexec_fn=preexec_function, env=command_env)
 
 else:
@@ -146,7 +148,7 @@ else:
         shutil.rmtree(DATA_DIR)
 
     command = [
-        "etcd",
+        f"{ETCD_DIR}/etcd",
         "--enable-v2",
         "--name", f"{INSTANCE_ID}",
         f"--initial-cluster", ','.join(initial_cluster),
@@ -158,4 +160,5 @@ else:
     ]
     command_env = env.copy()
     command_env.update({'ETCD_INITIAL_CLUSTER_TOKEN': ETCD_INITIAL_CLUSTER_TOKEN})
+    command_env.update({'ETCD_DATA_DIR': DATA_DIR})
     subprocess.call(command, stdout=sys.stdout, preexec_fn=preexec_function, env=command_env)

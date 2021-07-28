@@ -3,6 +3,7 @@ FROM alpine:3.14
 MAINTAINER Ilia Dmitriev ilia.dmitriev@gmail.com
 
 ENV ETCD_DIR=/opt/etcd \
+    ETCD_DATA=/var/lib/etcd \
     ETCD_USER=etcd \
     ETCD_GROUP=etcd
 
@@ -26,6 +27,8 @@ RUN set -xe \
     && mkdir /opt/etcd \
     && tar -xvf /tmp/etcd-v3.5.0.tar.gz -C $ETCD_DIR --strip-components=1 \
     && chown -R $ETCD_USER:$ETCD_GROUP $ETCD_DIR \
+    && mkdir -p $ETCD_DATA \
+    && chown -R $ETCD_USER:$ETCD_GROUP $ETCD_DATA \
 
 # cleanup
     && rm -rf /tmp/* \
@@ -36,4 +39,6 @@ COPY --chown=etcd etcd-cluster.py $ETCD_DIR/etcd-cluster.py
 
 USER $ETCD_USER
 
-CMD ['/usr/bin/python3', 'etcd-cluster.py']
+EXPOSE 2379 2380
+
+CMD ["/usr/bin/python3", "/opt/etcd/etcd-cluster.py"]
