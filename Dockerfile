@@ -10,7 +10,7 @@ ENV ETCD_DIR=/opt/etcd \
 
 RUN set -xe \
     # install python3 and pip
-    && apk add --no-cache python3 py3-pip \
+    && apk add --no-cache python3 py3-requests \
 
     # Install etcd
     && echo "Current etcd arch is $(uname -m)" \
