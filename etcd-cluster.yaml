@@ -33,6 +33,16 @@ spec:
       labels:
         app: pg-etcd
     spec:
+#      affinity:
+#        podAntiAffinity:
+#          requiredDuringSchedulingIgnoredDuringExecution:
+#            - topologyKey: "kubernetes.io/hostname"
+#              labelSelector:
+#                matchExpressions:
+#                  - key: app
+#                    operator: In
+#                    values:
+#                      - pg-etcd
       containers:
       - name: pg-etcd
         imagePullPolicy: Always
@@ -71,6 +81,8 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: pg-etcd-pvc
+      labels:
+        app: pg-etcd
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
