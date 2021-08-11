@@ -6,7 +6,7 @@ ENV ETCD_DIR=/opt/etcd \
     ETCD_DATA=/var/lib/etcd \
     ETCD_USER=etcd \
     ETCD_GROUP=etcd \
-    PATH="${PATH}:${ETCD_DIR}"
+    PATH="${PATH}:/opt/etcd"
 
 RUN set -xe \
     # install python3 and pip
